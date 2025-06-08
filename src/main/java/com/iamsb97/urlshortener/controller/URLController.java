@@ -38,7 +38,7 @@ public class URLController {
 
     @GetMapping("/{urlHash}")
     public ResponseEntity<String> getURL (@PathVariable String urlHash) {
-        String longURL = shortener.retrieve(baseURL + urlHash);
+        String longURL = shortener.retrieve(urlHash);
         if (longURL == null) {
             return new ResponseEntity<String>("This short URL doesn't exist.", HttpStatus.NOT_FOUND);
         }
@@ -53,9 +53,9 @@ public class URLController {
         if (shortURL == null) {
             return ResponseEntity.badRequest().body("JSON body of the request doesn't exist or couldn't be parsed.");
         }
-        HttpStatus status = shortener.delete(shortURL);
-        if (status != HttpStatus.OK) {
-            return new ResponseEntity<String>("URL couldn't be deleted", status);
+        Boolean status = shortener.delete(shortURL);
+        if (status == true) {
+            return new ResponseEntity<String>("URL couldn't be deleted", HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok("URL deleted successfully.");
     }
