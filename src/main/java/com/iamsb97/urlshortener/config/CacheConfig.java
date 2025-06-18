@@ -1,18 +1,20 @@
 package com.iamsb97.urlshortener.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.Getter;
+import lombok.Setter;
 import redis.clients.jedis.JedisPool;
 
+@Getter
+@Setter
 @Configuration
+@ConfigurationProperties(prefix = "spring.redis")
 public class CacheConfig {
 
-    @Value("${redis.host}")
     private String host;
-
-    @Value("${redis.port}")
     private int port;
 
     @Bean

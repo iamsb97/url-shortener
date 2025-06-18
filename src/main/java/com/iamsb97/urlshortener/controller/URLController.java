@@ -18,7 +18,7 @@ import com.iamsb97.urlshortener.service.ShortenerService;
 @RestController
 public class URLController {
 
-    @Value("${app.base-url}")
+    @Value("${spring.application.base-url}")
     private String baseURL;
     private ShortenerService shortener;
 
@@ -53,8 +53,9 @@ public class URLController {
         if (shortURL == null) {
             return ResponseEntity.badRequest().body("JSON body of the request doesn't exist or couldn't be parsed.");
         }
-        Boolean status = shortener.delete(shortURL);
-        if (status == true) {
+        String urlKey = shortURL.substring(shortURL.lastIndexOf('/') + 1);
+        Boolean status = shortener.delete(urlKey);
+        if (status != true) {
             return new ResponseEntity<String>("URL couldn't be deleted", HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok("URL deleted successfully.");
