@@ -33,6 +33,9 @@ public class URLController {
             return ResponseEntity.badRequest().body("JSON body of the request doesn't exist or couldn't be parsed.");
         }
         String shortURL = shortener.shorten(longURL);
+        if (shortURL == null) {
+            return ResponseEntity.internalServerError().body("Couldn't shorten the URL at this time. Please try again.");
+        }
         return ResponseEntity.ok(shortURL);
     }
 

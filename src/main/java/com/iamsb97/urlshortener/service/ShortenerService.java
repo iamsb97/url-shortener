@@ -2,7 +2,6 @@ package com.iamsb97.urlshortener.service;
 
 import java.sql.SQLException;
 
-import org.postgresql.util.PSQLState;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +13,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ShortenerService {
 
-    @Value("${shortener.key-length}")
-    private int keyLength;
-
     @Value("${spring.application.base-url}")
     private String baseURL;
 
     private final CacheService cache;
     private final URLRepository repo;
+    private final KeyPoolManager keyPool;
     
     public String shorten(String url) {
         if (cache.get(url) != null) {
@@ -40,19 +37,20 @@ public class ShortenerService {
         }
         
         for (int retry = 0; retry < 10; retry++) {
-            String key = generateRandomKey(keyLength);
-            if (cache.get(key) == null) {
-                try {
-                    repo.save(key, url);
-                    cache.put(key, url);
-                    return baseURL + key;
-                } catch (SQLException e) {
-                    if (PSQLState.UNIQUE_VIOLATION == PSQLState.valueOf(e.getSQLState())) {
-                        System.err.println("Insert failed: " + e.getMessage());
-                        continue;
-                    } else {
-                        e.printStackTrace();
-                    }
+            String key = keyPool.getNextKey();
+
+            if (key == null) return null;
+
+            try {
+                repo.save(key, url);
+                cache.put(key, url);
+                return baseURL + key;
+            } catch (SQLException e) {
+                if ("23505" == e.getSQLState()) {
+                    System.err.println("Insert failed: " + e.getMessage());
+                    continue;
+                } else {
+                    e.printStackTrace();
                 }
             }
         }
@@ -90,19 +88,6 @@ public class ShortenerService {
         }
 
         return false;
-    }
-
-    private String generateRandomKey(int length) {
-        final String randomKeyCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        StringBuilder sb = new StringBuilder(length);
-
-        for (int i = 0; i < length; i++) {
-            int index = (int) ((randomKeyCharSet.length()) * Math.random());
-            sb.append(randomKeyCharSet.charAt(index));
-        }
-
-        return sb.toString();
     }
 
 }

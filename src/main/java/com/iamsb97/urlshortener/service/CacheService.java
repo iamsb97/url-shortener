@@ -45,4 +45,44 @@ public class CacheService {
             return false;
         }
     }
+
+    public void addKeyToPool(String keySet, String keyQueue, String val) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.lpush(keyQueue, val);
+            jedis.sadd(keySet, val);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public String remKeyFromPool(String keySet, String keyQueue) {
+        String val = null;
+
+        try (Jedis jedis = jedisPool.getResource()) {
+            val = jedis.rpop(keyQueue);
+            jedis.srem(keySet, val);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+
+        return val;
+    }
+
+    public long getKeyPoolSize(String key) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.scard(key);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        return -1;
+    }
+
+    public boolean duplicateKey(String keySet, String key) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.sismember(keySet, key);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        return true;
+    }
 }
