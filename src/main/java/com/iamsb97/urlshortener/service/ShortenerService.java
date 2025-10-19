@@ -48,7 +48,6 @@ public class ShortenerService {
             } catch (SQLException e) {
                 if ("23505" == e.getSQLState()) {
                     System.err.println("Insert failed: " + e.getMessage());
-                    continue;
                 } else {
                     e.printStackTrace();
                 }
@@ -59,12 +58,13 @@ public class ShortenerService {
     }
 
     public String retrieve(String shortURL) {
-        String longURL = cache.get(shortURL);
+        String shortKey = shortURL.substring(shortURL.lastIndexOf('/') + 1);
+        String longURL = cache.get(shortKey);
         if (longURL == null) {
             try {
-                longURL = repo.searchLongURL(shortURL);
+                longURL = repo.searchLongURL(shortKey);
                 if (longURL != null) {
-                    cache.put(shortURL, longURL);
+                    cache.put(shortKey, longURL);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -75,13 +75,14 @@ public class ShortenerService {
 
     public Boolean delete(String shortURL) {
         boolean deleted;
+        String shortKey = shortURL.substring(shortURL.lastIndexOf('/') + 1);
         
-        if (cache.get(shortURL) != null) {
-            cache.delete(shortURL);
+        if (cache.get(shortKey) != null) {
+            cache.delete(shortKey);
         }
 
         try {
-            deleted = repo.delete(shortURL);
+            deleted = repo.delete(shortKey);
             if (deleted) return true;
         } catch (SQLException e) {
             e.printStackTrace();
