@@ -19,7 +19,7 @@ import com.iamsb97.urlshortener.service.ShortenerService;
 public class UrlController {
 
     @Value("${spring.application.base-url}")
-    private String baseURL;
+    private String baseUrl;
     private ShortenerService shortener;
 
     public UrlController(ShortenerService shortener) {
@@ -27,36 +27,36 @@ public class UrlController {
     }
 
     @PostMapping("/api/shorten")
-    public ResponseEntity<String> shortenURL (@RequestBody Map<String,String> requestBody) {
-        String longURL = requestBody.get("url");
-        if (longURL == null) {
+    public ResponseEntity<String> shortenUrl (@RequestBody Map<String,String> requestBody) {
+        String longUrl = requestBody.get("url");
+        if (longUrl == null) {
             return ResponseEntity.badRequest().body("JSON body of the request doesn't exist or couldn't be parsed.");
         }
-        String shortURL = shortener.shorten(longURL);
-        if (shortURL == null) {
+        String shortUrl = shortener.shorten(longUrl);
+        if (shortUrl == null) {
             return ResponseEntity.internalServerError().body("Couldn't shorten the URL at this time. Please try again.");
         }
-        return ResponseEntity.ok(shortURL);
+        return ResponseEntity.ok(shortUrl);
     }
 
     @GetMapping("/{urlHash}")
-    public ResponseEntity<String> getURL (@PathVariable String urlHash) {
-        String longURL = shortener.retrieve(urlHash);
-        if (longURL == null) {
+    public ResponseEntity<String> getUrl (@PathVariable String urlHash) {
+        String longUrl = shortener.retrieve(urlHash);
+        if (longUrl == null) {
             return new ResponseEntity<String>("This short URL doesn't exist.", HttpStatus.NOT_FOUND);
         }
         HttpHeaders header = new HttpHeaders();
-        header.add("Location", longURL);
+        header.add("Location", longUrl);
         return new ResponseEntity<>(header, HttpStatus.FOUND);
     }
 
     @DeleteMapping("/api/delete")
-    public ResponseEntity<String> deleteURL (@RequestBody Map<String,String> requestBody) {
-        String shortURL = requestBody.get("url");
-        if (shortURL == null) {
+    public ResponseEntity<String> deleteUrl (@RequestBody Map<String,String> requestBody) {
+        String shortUrl = requestBody.get("url");
+        if (shortUrl == null) {
             return ResponseEntity.badRequest().body("JSON body of the request doesn't exist or couldn't be parsed.");
         }
-        String urlKey = shortURL.substring(shortURL.lastIndexOf('/') + 1);
+        String urlKey = shortUrl.substring(shortUrl.lastIndexOf('/') + 1);
         Boolean status = shortener.delete(urlKey);
         if (status != true) {
             return new ResponseEntity<String>("URL couldn't be deleted", HttpStatus.NOT_FOUND);

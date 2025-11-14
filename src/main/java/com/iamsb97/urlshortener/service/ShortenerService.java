@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class ShortenerService {
 
     @Value("${spring.application.base-url}")
-    private String baseURL;
+    private String baseUrl;
 
     private final CacheService cache;
     private final UrlRepository repo;
@@ -22,13 +22,13 @@ public class ShortenerService {
     
     public String shorten(String url) {
         if (cache.get(url) != null) {
-            return baseURL + cache.get(url);
+            return baseUrl + cache.get(url);
         } else {
             try {
-                String shortKey = repo.searchShortURL(url);
+                String shortKey = repo.searchShortUrl(url);
                 if (shortKey != null) {
                     cache.put(shortKey, url);
-                    return baseURL + shortKey;
+                    return baseUrl + shortKey;
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -44,7 +44,7 @@ public class ShortenerService {
             try {
                 repo.save(key, url);
                 cache.put(key, url);
-                return baseURL + key;
+                return baseUrl + key;
             } catch (SQLException e) {
                 if ("23505" == e.getSQLState()) {
                     System.err.println("Insert failed: " + e.getMessage());
@@ -57,25 +57,25 @@ public class ShortenerService {
         return null;
     }
 
-    public String retrieve(String shortURL) {
-        String shortKey = shortURL.substring(shortURL.lastIndexOf('/') + 1);
-        String longURL = cache.get(shortKey);
-        if (longURL == null) {
+    public String retrieve(String shortUrl) {
+        String shortKey = shortUrl.substring(shortUrl.lastIndexOf('/') + 1);
+        String longUrl = cache.get(shortKey);
+        if (longUrl == null) {
             try {
-                longURL = repo.searchLongURL(shortKey);
-                if (longURL != null) {
-                    cache.put(shortKey, longURL);
+                longUrl = repo.searchLongUrl(shortKey);
+                if (longUrl != null) {
+                    cache.put(shortKey, longUrl);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        return longURL;
+        return longUrl;
     }
 
-    public Boolean delete(String shortURL) {
+    public Boolean delete(String shortUrl) {
         boolean deleted;
-        String shortKey = shortURL.substring(shortURL.lastIndexOf('/') + 1);
+        String shortKey = shortUrl.substring(shortUrl.lastIndexOf('/') + 1);
         
         if (cache.get(shortKey) != null) {
             cache.delete(shortKey);

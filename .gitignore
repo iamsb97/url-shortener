@@ -3,3 +3,4 @@ target/*
 .mvn/*
 .idea/
 .java-version
+.DS_Store

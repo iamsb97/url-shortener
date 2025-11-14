@@ -12,10 +12,10 @@ public class CacheService {
     
     private final JedisPool jedisPool;
 
-    public boolean put(String shortURL, String longURL) {
+    public boolean put(String shortUrl, String longUrl) {
         try (Jedis jedis = jedisPool.getResource()) {
-            jedis.set(shortURL, longURL);
-            jedis.set(longURL, shortURL);
+            jedis.set(shortUrl, longUrl);
+            jedis.set(longUrl, shortUrl);
             return true;
         } catch (Exception e) {
             System.err.println(e.getMessage());

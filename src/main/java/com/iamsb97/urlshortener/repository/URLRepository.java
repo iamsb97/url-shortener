@@ -17,29 +17,29 @@ public class UrlRepository {
 
     private final DataSource dataSource;
 
-    public void save(String shortURL, String longURL) throws SQLException {
+    public void save(String shortUrl, String longUrl) throws SQLException {
         String sqlStmt = "INSERT INTO urltab (short_url, long_url) VALUES (?, ?)";
         try (Connection conn = dataSource.getConnection(); 
             PreparedStatement stmt = conn.prepareStatement(sqlStmt)) {
-                stmt.setString(1, shortURL);
-                stmt.setString(2, longURL);
+                stmt.setString(1, shortUrl);
+                stmt.setString(2, longUrl);
                 stmt.executeUpdate();
             }
     }
 
-    public String searchShortURL(String longURL) throws SQLException {
-        return searchURL("short_url", "long_url", longURL);
+    public String searchShortUrl(String longUrl) throws SQLException {
+        return searchUrl("short_url", "long_url", longUrl);
     }
 
-    public String searchLongURL(String shortURL) throws SQLException {
-        return searchURL("long_url", "short_url", shortURL);
+    public String searchLongUrl(String shortUrl) throws SQLException {
+        return searchUrl("long_url", "short_url", shortUrl);
     }
 
-    public Boolean delete(String shortURL) throws SQLException {
+    public Boolean delete(String shortUrl) throws SQLException {
         String sqlStmt = "DELETE FROM urltab WHERE short_url = ?";
         try (Connection conn = dataSource.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sqlStmt)) {
-                stmt.setString(1, shortURL);
+                stmt.setString(1, shortUrl);
                 int rowsDeleted = stmt.executeUpdate();
                 if (rowsDeleted > 0) return true;
             }
@@ -47,7 +47,7 @@ public class UrlRepository {
         return false;
     }
 
-    private String searchURL(String toSearchKey, String searchByKey, String searchByVal) throws SQLException {
+    private String searchUrl(String toSearchKey, String searchByKey, String searchByVal) throws SQLException {
         String sqlStmt = "SELECT " + toSearchKey + " FROM urltab WHERE " + searchByKey + " = ?";
         try (Connection conn = dataSource.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sqlStmt)) {

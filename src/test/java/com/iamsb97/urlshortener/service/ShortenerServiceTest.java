@@ -30,7 +30,7 @@ class ShortenerServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         urlService = new ShortenerService(cache, repository, keyPoolManager);
-        ReflectionTestUtils.setField(urlService, "baseURL", "http://localhost:8080/");
+        ReflectionTestUtils.setField(urlService, "baseUrl", "http://localhost:8080/");
     }
 
     @Test
@@ -65,7 +65,7 @@ class ShortenerServiceTest {
         String shortUrl = "http://localhost:8080/" + shortKey;
 
         when(cache.get(shortKey)).thenReturn(null);
-        when(repository.searchLongURL(shortUrl)).thenReturn(null);
+        when(repository.searchLongUrl(shortUrl)).thenReturn(null);
 
         String notFound = urlService.retrieve(shortUrl);
 
