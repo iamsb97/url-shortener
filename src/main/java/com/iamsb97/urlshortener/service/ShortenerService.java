@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.iamsb97.urlshortener.repository.URLRepository;
+import com.iamsb97.urlshortener.repository.UrlRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +17,7 @@ public class ShortenerService {
     private String baseURL;
 
     private final CacheService cache;
-    private final URLRepository repo;
+    private final UrlRepository repo;
     private final KeyPoolManager keyPool;
     
     public String shorten(String url) {

@@ -1,6 +1,6 @@
 package com.iamsb97.urlshortener.service;
 
-import com.iamsb97.urlshortener.repository.URLRepository;
+import com.iamsb97.urlshortener.repository.UrlRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
@@ -20,7 +20,7 @@ class ShortenerServiceTest {
     private ShortenerService urlService;
 
     @Mock
-    private URLRepository repository;
+    private UrlRepository repository;
     @Mock
     private CacheService cache;
     @Mock
