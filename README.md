@@ -39,7 +39,6 @@ A minimal Spring Boot service to shorten long URLs and redirect them efficiently
 
 ## Next Steps
 
-- Improve input-output 
 - Add logging
 - Add authentication to APIs
 - Docker support  

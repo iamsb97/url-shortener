@@ -1,5 +1,6 @@
 package com.iamsb97.urlshortener.service;
 
+import com.iamsb97.urlshortener.dto.ShortenUrlResponseDto;
 import com.iamsb97.urlshortener.repository.UrlRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,10 +41,10 @@ class ShortenerServiceTest {
 
         when(keyPoolManager.getNextKey()).thenReturn(shortKey);
 
-        String result = urlService.shorten(longUrl);
+        ShortenUrlResponseDto result = urlService.shorten(longUrl);
 
         assertNotNull(result);
-        assertEquals(29, result.length());
+        assertEquals(29, result.getShortUrl().length());
         verify(repository).save(anyString(), eq(longUrl));
     }
 

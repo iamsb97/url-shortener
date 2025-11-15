@@ -2,6 +2,7 @@ package com.iamsb97.urlshortener.service;
 
 import java.sql.SQLException;
 
+import com.iamsb97.urlshortener.dto.ShortenUrlResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +21,16 @@ public class ShortenerService {
     private final UrlRepository repo;
     private final KeyPoolManager keyPool;
     
-    public String shorten(String url) {
-        if (cache.get(url) != null) {
-            return baseUrl + cache.get(url);
+    public ShortenUrlResponseDto shorten(String url) {
+        String cachedKey;
+        if ((cachedKey = cache.get(url)) != null) {
+            return new ShortenUrlResponseDto(baseUrl + cachedKey, cachedKey);
         } else {
             try {
                 String shortKey = repo.searchShortUrl(url);
                 if (shortKey != null) {
                     cache.put(shortKey, url);
-                    return baseUrl + shortKey;
+                    return new ShortenUrlResponseDto(baseUrl + shortKey, shortKey);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -44,9 +46,9 @@ public class ShortenerService {
             try {
                 repo.save(key, url);
                 cache.put(key, url);
-                return baseUrl + key;
+                return new ShortenUrlResponseDto(baseUrl + key, key);
             } catch (SQLException e) {
-                if ("23505" == e.getSQLState()) {
+                if ("23505".equals(e.getSQLState())) {
                     System.err.println("Insert failed: " + e.getMessage());
                 } else {
                     e.printStackTrace();
