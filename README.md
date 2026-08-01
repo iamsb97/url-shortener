@@ -6,9 +6,9 @@ A minimal Spring Boot service to shorten long URLs and redirect them efficiently
 
 ## Tech Stack
 
-- **Java 17**, Spring Boot (no Spring Data)
+- **Java 21**, Spring Boot (no Spring Data)
 - **PostgreSQL** for persistence  
-- **Redis (Jedis)** for caching and maintaining key pool
+- **Redis (Jedis)** for caching
 - **HikariCP** for DB connection pooling
 
 ---
@@ -18,7 +18,7 @@ A minimal Spring Boot service to shorten long URLs and redirect them efficiently
 - Converts long URLs into short keys  
 - 302 redirects for short URLs  
 - Redis caching for performance  
-- Retry logic for key collisions  
+- Generates Base62 short keys from database IDs  
 - Clean separation: Controller → Service → Repository
 
 ---
