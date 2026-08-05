@@ -5,8 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
-
 import com.iamsb97.urlshortener.repository.model.UrlRow;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class UrlRepository {
-
-    private final DataSource dataSource;
 
     public UrlRow insertLongUrl(Connection conn, String longUrl) throws SQLException {
         Long id = null;

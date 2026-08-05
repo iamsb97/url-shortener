@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -88,6 +89,21 @@ class ShortenerServiceTest {
     }
 
     @Test
+    void shortenLoadsExistingShortKeyWhenUpdateIsSkipped() throws SQLException {
+        when(dataSource.getConnection()).thenReturn(connection);
+        when(repository.insertLongUrl(connection, LONG_URL)).thenReturn(new UrlRow(123L, null));
+        when(repository.insertShortUrl(connection, 123L, SHORT_KEY)).thenReturn(0);
+        when(repository.searchShortUrl(connection, LONG_URL)).thenReturn("existing");
+
+        ShortenUrlResponseDto result = shortenerService.shorten(LONG_URL);
+
+        assertNotNull(result);
+        assertEquals(BASE_URL + "existing", result.getShortUrl());
+        verify(connection).commit();
+        verify(cache).put("existing", LONG_URL);
+    }
+
+    @Test
     void retrieveReturnsCachedLongUrl() throws SQLException {
         when(cache.get(SHORT_KEY)).thenReturn(LONG_URL);
 
@@ -107,6 +123,18 @@ class ShortenerServiceTest {
 
         assertEquals(LONG_URL, result);
         verify(cache).put(SHORT_KEY, LONG_URL);
+    }
+
+    @Test
+    void retrieveReturnsNullWhenDatabaseRecordIsMissing() throws SQLException {
+        when(cache.get(SHORT_KEY)).thenReturn(null);
+        when(dataSource.getConnection()).thenReturn(connection);
+        when(repository.searchLongUrl(connection, SHORT_KEY)).thenReturn(null);
+
+        String result = shortenerService.retrieve(SHORT_KEY);
+
+        assertNull(result);
+        verify(cache, never()).put(SHORT_KEY, LONG_URL);
     }
 
     @Test
@@ -132,5 +160,12 @@ class ShortenerServiceTest {
 
         assertFalse(deleted);
         verify(cache, never()).delete(SHORT_KEY);
+    }
+
+    @Test
+    void base62EncodeHandlesAlphabetBoundaries() {
+        assertEquals("z", ReflectionTestUtils.invokeMethod(shortenerService, "base62encode", 61L));
+        assertEquals("10", ReflectionTestUtils.invokeMethod(shortenerService, "base62encode", 62L));
+        assertEquals("100", ReflectionTestUtils.invokeMethod(shortenerService, "base62encode", 3_844L));
     }
 }
